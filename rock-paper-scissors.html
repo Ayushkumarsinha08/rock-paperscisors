@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Rock Paper Scissors
+    </title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        .title {
+            font-size: 30px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <P class="title">Rock Paper Scissors</P>
+    <button class="js-rock-button"><img height="50px"
+            src="C:\Users\ASUS\Desktop\Coding\javasript\rock-emoji.png"></button>
+    <button class="js-paper-button"><img src="C:\Users\ASUS\Desktop\Coding\javasript\paper-emoji.png"></button>
+    <button class="js-scissors-button"><img src="C:\Users\ASUS\Desktop\Coding\javasript\scissors-emoji.png"></button>
+    <p class="js-result"></p>
+    <p class="js-moves"></p>
+    <p class="js-score"></p>
+    <button class="js-reset-score">Reset Score</button>
+    <button class="js-auto-play">Auto Play</button>
+    <p class="js-reset-score-conformation"></p>
+
+    <script>
+        const rockEvent = document.querySelector('.js-rock-button');
+        rockEvent.addEventListener('click', () => {
+            playGame('Rock');
+        });
+        const paperEvent = document.querySelector('.js-paper-button');
+        paperEvent.addEventListener('click', () => {
+            playGame('Paper');
+        });
+        const scissorsEvent = document.querySelector('.js-scissors-button');
+        scissorsEvent.addEventListener('click', () => {
+            playGame('Scissors');
+        });
+        document.body.addEventListener('keydown', (event) => {
+            if (event.key === 'r') {
+                playGame('Rock');
+            } else if (event.key === 'p') {
+                playGame('Paper');
+            } else if (event.key === 's') {
+                playGame('Scissors');
+            }
+            //console.log(event);
+        });
+        document.querySelector('.js-reset-score')
+            .addEventListener('click', () => {
+                document.querySelector('.js-reset-score-conformation')
+                .innerHTML=`Are you Sure? 
+                <button class="js-reset-yes">Yes</button>
+                <button class="js-reset-no">NO</button>`;
+                document.querySelector('.js-reset-yes').addEventListener('click',()=>{
+            score.wins = 0;
+                    score.losses = 0;
+                    score.ties = 0;
+                    localStorage.removeItem('score');
+                    updateScoreElement();
+                    updateMoves();
+                    updateResult();
+                    document.querySelector('.js-reset-score-conformation')
+                .innerHTML='';
+        });
+        document.querySelector('.js-reset-no').addEventListener('click',()=>{
+            document.querySelector('.js-reset-score-conformation')
+                .innerHTML='';
+        });
+
+            });
+       
+
+        document.body
+            .addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace') {
+                    document.querySelector('.js-reset-score-conformation')
+                .innerHTML=`Are you Sure? 
+                <button class="js-reset-yes">Yes</button>
+                <button class="js-reset-no">NO</button>`;
+                document.querySelector('.js-reset-yes').addEventListener('click',()=>{
+            score.wins = 0;
+                    score.losses = 0;
+                    score.ties = 0;
+                    localStorage.removeItem('score');
+                    updateScoreElement();
+                    updateMoves();
+                    updateResult();
+                    document.querySelector('.js-reset-score-conformation')
+                .innerHTML='';
+        });
+        document.querySelector('.js-reset-no').addEventListener('click',()=>{
+            document.querySelector('.js-reset-score-conformation')
+                .innerHTML='';
+        });
+
+
+                }
+            });
+        let score = JSON.parse(localStorage.getItem('score'))
+            || {
+            wins: 0,
+            losses: 0,
+            ties: 0
+        };
+
+        updateScoreElement();
+
+        function playGame(playerMove) {
+            const computerMove = pickComputerMove();
+            let result = '';
+            if (playerMove === 'Rock') {
+                if (computerMove === 'Rock') {
+                    result = 'game tie!';
+                } else if (computerMove === 'Paper') {
+                    result = 'you lose';
+                } else {
+                    result = 'you won';
+                }
+            }
+            else if (playerMove === 'Paper') {
+                if (computerMove === 'Rock') {
+                    result = 'you won';
+                } else if (computerMove === 'Paper') {
+                    result = 'game tie!';
+                } else {
+                    result = 'you lose';
+                }
+            }
+            else if (playerMove === 'Scissors') {
+                if (computerMove === 'Rock') {
+                    result = 'game tie!';
+                } else if (computerMove === 'Paper') {
+                    result = 'you lose';
+                } else {
+                    result = 'you won';
+                }
+            }
+            if (result === 'you won') {
+                score.wins += 1;
+            } else if (result === 'you lose') {
+                score.losses += 1;
+            } else if (result === 'game tie!') {
+                score.ties += 1;
+            }
+            localStorage.setItem('score', JSON.stringify(score));
+
+            updateScoreElement();
+
+            document.querySelector('.js-result')
+                .innerHTML = `${result}`;
+            document.querySelector('.js-moves')
+                .innerHTML = `you ${playerMove} - ${computerMove} Computer`;
+            // results are now displayed in html elements instead a popup
+            //             alert(`you picked ${playerMove} and computer chose ${computerMove} and ${result}
+            // wins=${score.wins} losses=${score.losses} ties=${score.ties}`);
+        }
+        function updateScoreElement() {
+
+            document.querySelector('.js-score')
+                .innerHTML = `wins ${score.wins} losses ${score.losses} ties ${score.ties}`;
+        }
+        function updateMoves() {
+            document.querySelector('.js-moves')
+                .innerHTML = '';
+        }
+        function updateResult() {
+            document.querySelector('.js-result')
+                .innerHTML = '';
+        }
+        function pickComputerMove() {
+            let computerMove = Math.random();
+            if (computerMove >= 0 && computerMove < 1 / 3) {
+                computerMove = 'Rock;'
+            } else if (computerMove >= 1 / 3 && computerMove < 2 / 3) {
+                computerMove = 'Paper';
+            } else {
+                computerMove = 'Scissors';
+            }
+            return computerMove;
+        }
+        let isAutoPlaying = false;
+        let intervalId;
+        document.querySelector('.js-auto-play')
+            .addEventListener('click', () => {
+                if (!isAutoPlaying) {
+                    intervalId = setInterval(
+                        function () {
+                            const playerMove = pickComputerMove();
+                            playGame(playerMove);
+                        }, 1000);
+                    document.querySelector('.js-auto-play')
+                        .innerHTML = 'Stop Playing...'
+                    isAutoPlaying = true;
+                }
+                else {
+                    clearInterval(intervalId);
+                    document.querySelector('.js-auto-play')
+                        .innerHTML = 'Auto Play'
+                    isAutoPlaying = false;
+                }
+
+            });
+        document.body.addEventListener('keydown', (event) => {
+            if (event.key === 'a') {
+                if (!isAutoPlaying) {
+                    intervalId = setInterval(
+                        function () {
+                            const playerMove = pickComputerMove();
+                            playGame(playerMove);
+                        }, 1000);
+                    document.querySelector('.js-auto-play')
+                        .innerHTML = 'Stop Playing...'
+                    isAutoPlaying = true;
+                }
+                else {
+                    clearInterval(intervalId);
+                    document.querySelector('.js-auto-play')
+                        .innerHTML = 'Auto Play'
+                    isAutoPlaying = false;
+                }
+            }
+        });
+        /*  function autoPlay() {         // autoplay() fn nomore needed as done through addEventListener()
+              if (!isAutoPlaying) {
+                  intervalId = setInterval(
+                      function () {
+                          const playerMove = pickComputerMove();
+                          playGame(playerMove);
+                      }, 1000);
+                  isAutoPlaying = true;
+              }
+              else {
+                  clearInterval(intervalId);
+                  isAutoPlaying = false;
+              }
+  
+          }
+              */
+    </script>
+</body>
+
+</html>
